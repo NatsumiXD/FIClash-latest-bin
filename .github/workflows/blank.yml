@@ -36,16 +36,13 @@ jobs:
           curl -L -o FlClash-$LATEST_TAG_NAME-android-x86_64.apk "$APK_X86_64_URL"
           curl -L -o FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe "$EXE_AMD64_URL"
 
-      - name: Commit files
+      - name: 运行脚本
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "Automated commit: Update files from latest release" || echo "No changes to commit"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          # 使用 PAT 代替 GITHUB_TOKEN
-          github_token: ${{ secrets.PAT_TOKEN }}
-          branch: main # 或者是你的默认分支名称
+            cd ${GITHUB_WORKSPACE}
+            python main.py
+      - name: 提交更新
+        # You may pin to the exact commit or the version.
+        # uses: actions-x/commit@803b20e5b72c0425eb7919c42c321e67c5bc5d2d
+        uses: actions-x/commit@v6
+        with: 
+          commit_message: "更新"
