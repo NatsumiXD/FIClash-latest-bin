@@ -14,27 +14,28 @@ jobs:  # 定义作业
         with:
           token: ${{ secrets.PAT_TOKEN }} # 使用 PAT
 
-      - name: Fetch latest release assets  # 获取最新发布的资源文件
-        run: |  # 执行 shell 命令
+      - name: Fetch latest release assets
+        run: |
           # 安装必要的工具
           sudo apt-get update && sudo apt-get install -y curl jq git
-
+      
           # 获取最新的 release 信息
           LATEST_RELEASE_INFO=$(curl --silent "https://api.github.com/repos/chen08209/FlClash/releases/latest")
-          LATEST_TAG_NAME=$(echo $LATEST_RELEASE_INFO | jq -r '.tag_name')
-
-          # 构造每个文件的 URL
-          APK_ARM64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-android-arm64-v8a.apk"
-          APK_ARMEABI_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-android-armeabi-v7a.apk"
-          APK_X86_64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-android-x86_64.apk"
-          EXE_AMD64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe"
-
+      
+          # 提取 assets 列表
+          ASSETS=$(echo $LATEST_RELEASE_INFO | jq -r '.assets[] | .browser_download_url')
+      
           # 进入工作区目录下载文件
           cd ${GITHUB_WORKSPACE}
-          curl -L -o FlClash-$LATEST_TAG_NAME-android-arm64-v8a.apk "$APK_ARM64_URL"
-          curl -L -o FlClash-$LATEST_TAG_NAME-android-armeabi-v7a.apk "$APK_ARMEABI_URL"
-          curl -L -o FlClash-$LATEST_TAG_NAME-android-x86_64.apk "$APK_X86_64_URL"
-          curl -L -o FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe "$EXE_AMD64_URL"
+      
+          # 遍历 assets 并下载匹配的文件
+          for asset in $ASSETS; do
+            if [[ $asset == *"arm64-v8a"* ]] || [[ $asset == *"armeabi-v7a"* ]] || [[ $asset == *"x86_64"* ]] || [[ $asset == *"amd64-setup"* ]]; then
+              FILENAME=$(basename "$asset")
+              echo "Downloading $FILENAME..."
+              curl -L -o "$FILENAME" "$asset"
+            fi
+          done
 
       - name: Commit and Push changes
         uses: stefanzweifel/git-auto-commit-action@v4
