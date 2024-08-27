@@ -46,6 +46,6 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          # 无需再次检查 out，因为我们已经在之前的步骤中完成了
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # 使用 PAT 代替 GITHUB_TOKEN
+          github_token: ${{ secrets.PAT_TOKEN }}
           branch: main # 或者是你的默认分支名称
