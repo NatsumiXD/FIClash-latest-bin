@@ -1,0 +1,51 @@
+name: Fetch and Commit Latest Releases
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # 每周日午夜执行 (Cron 表达式)
+  workflow_dispatch: # 添加手动触发事件
+
+jobs:
+  fetch-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          # 检出整个仓库的历史记录，以便于后续提交更改
+          fetch-depth: 0
+
+      - name: Fetch latest release assets
+        run: |
+          # 安装必要的工具
+          sudo apt-get update && sudo apt-get install -y curl jq
+
+          # 获取最新的 release 信息
+          LATEST_RELEASE_INFO=$(curl --silent "https://api.github.com/repos/chen08209/FlClash/releases/latest")
+          LATEST_TAG_NAME=$(echo $LATEST_RELEASE_INFO | jq -r '.tag_name')
+
+          # 构造每个文件的 URL
+          APK_ARM64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-android-arm64-v8a.apk"
+          APK_ARMEABI_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-android-armeabi-v7a.apk"
+          APK_X86_64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-android-x86_64.apk"
+          EXE_AMD64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe"
+
+          # 下载文件
+          curl -L -o FlClash-$LATEST_TAG_NAME-android-arm64-v8a.apk "$APK_ARM64_URL"
+          curl -L -o FlClash-$LATEST_TAG_NAME-android-armeabi-v7a.apk "$APK_ARMEABI_URL"
+          curl -L -o FlClash-$LATEST_TAG_NAME-android-x86_64.apk "$APK_X86_64_URL"
+          curl -L -o FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe "$EXE_AMD64_URL"
+
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Automated commit: Update files from latest release" || echo "No changes to commit"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          # 无需再次检查 out，因为我们已经在之前的步骤中完成了
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main # 或者是你的默认分支名称
