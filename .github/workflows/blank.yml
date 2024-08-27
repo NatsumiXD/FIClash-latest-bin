@@ -36,7 +36,7 @@ jobs:  # 定义作业
           curl -L -o FlClash-$LATEST_TAG_NAME-android-x86_64.apk "$APK_X86_64_URL"
           curl -L -o FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe "$EXE_AMD64_URL"
 
-      - name: 提交更新  # 提交更新后的文件
-        uses: actions-x/commit@v6  # 使用 actions-x/commit action v6 版本
-        with:  # 设置参数
-          commit_message: "更新"  # 提交消息
+      - name: Commit and Push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Automatically committed changes by GitHub Actions'
