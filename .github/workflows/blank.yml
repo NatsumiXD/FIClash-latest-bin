@@ -9,10 +9,10 @@ jobs:  # 定义作业
   fetch-releases:  # 作业名称
     runs-on: ubuntu-latest  # 使用 Ubuntu 最新版本运行此作业
     steps:  # 步骤列表
-      - name: Checkout code  # 检出代码
-        uses: actions/checkout@v3  # 使用 checkout action v3 版本
-        with:  # 设置参数
-          fetch-depth: 0  # 检出整个仓库的历史记录，以便于后续提交更改
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }} # 使用 PAT
 
       - name: Fetch latest release assets  # 获取最新发布的资源文件
         run: |  # 执行 shell 命令
