@@ -17,7 +17,7 @@ jobs:  # 定义作业
       - name: Fetch latest release assets  # 获取最新发布的资源文件
         run: |  # 执行 shell 命令
           # 安装必要的工具
-          sudo apt-get update && sudo apt-get install -y curl jq
+          sudo apt-get update && sudo apt-get install -y curl jq git
 
           # 获取最新的 release 信息
           LATEST_RELEASE_INFO=$(curl --silent "https://api.github.com/repos/chen08209/FlClash/releases/latest")
