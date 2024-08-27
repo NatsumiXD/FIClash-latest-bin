@@ -31,15 +31,11 @@ jobs:
           EXE_AMD64_URL="https://github.com/chen08209/FlClash/releases/download/$LATEST_TAG_NAME/FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe"
 
           # 下载文件
+          cd ${GITHUB_WORKSPACE}
           curl -L -o FlClash-$LATEST_TAG_NAME-android-arm64-v8a.apk "$APK_ARM64_URL"
           curl -L -o FlClash-$LATEST_TAG_NAME-android-armeabi-v7a.apk "$APK_ARMEABI_URL"
           curl -L -o FlClash-$LATEST_TAG_NAME-android-x86_64.apk "$APK_X86_64_URL"
           curl -L -o FlClash-$LATEST_TAG_NAME-windows-amd64-setup.exe "$EXE_AMD64_URL"
-
-      - name: 运行脚本
-        run: |
-            cd ${GITHUB_WORKSPACE}
-            python main.py
       - name: 提交更新
         # You may pin to the exact commit or the version.
         # uses: actions-x/commit@803b20e5b72c0425eb7919c42c321e67c5bc5d2d
